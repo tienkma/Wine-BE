@@ -37,38 +37,9 @@ const getAllUsers = async (req, res) => {
   res.status(StatusCodes.OK).json({ users });
 };
 
-const changePassword = async (req, res) => {
-  const {  password, newPassword } = req.body;
-  const user = await Users.findById({ _id: req.params.id });
-  if (!user) {
-    return res
-      .status(StatusCodes.OK)
-      .json({ error: { msg: "Error Change Password" } });
-  }
-
-  const isPasswordCorrect = await bcrypt.compare(password, user.password)
-  if (!isPasswordCorrect) {
-    return res
-      .status(StatusCodes.OK)
-      .json({ error: { msg: "Wrong Password" } });
-  }
-
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash(newPassword, salt);
-  const updateUser = await Users.findByIdAndUpdate(
-    { _id: req.params.id },
-    { password: passwordHash },
-    {
-      new: true,
-    }
-  ).select({ password: false });
-  return res.status(StatusCodes.OK).json({ user: updateUser });
-};
-
 module.exports = {
   updateUser,
   getAllUsers,
   getUser,
   deleteUser,
-  changePassword,
 };

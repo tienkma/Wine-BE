@@ -1,10 +1,15 @@
 const express = require("express");
 const RouterOrder = express.Router();
 
-const { createOrder, getListOrder, getOrder } = require("../controllers/order");
+const {
+  createOrder,
+  orderQuery,
+  getOrder,
+  deleteOrder,
+} = require("../controllers/order");
 
-RouterOrder.route("/").get(getListOrder)
-RouterOrder.route("/user").get(getOrder).post(createOrder);
+RouterOrder.route("/").get(orderQuery).post(createOrder);
 
+RouterOrder.route("/:id").get(getOrder).delete(deleteOrder);
 
 module.exports = RouterOrder;

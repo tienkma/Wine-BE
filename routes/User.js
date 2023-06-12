@@ -6,10 +6,10 @@ const {
   updateUser,
   getUser,
   deleteUser,
-  changePassword
+  changePassword,
 } = require("../controllers/users");
 
 RouteUser.route("/").get(getAllUsers);
-RouteUser.route("/:id").get(getUser).put(updateUser).delete(deleteUser).post(changePassword);
+RouteUser.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
 
 module.exports = RouteUser;
