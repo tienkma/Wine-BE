@@ -13,6 +13,7 @@ RouterProduct.route("/:id")
   .put(putProduct)
   .delete(deleteProduct);
 
-RouterProduct.route("/").get(getAllProduct).post(postProduct);
+RouterProduct.route("/").post(getAllProduct);
+RouterProduct.route("/create").post(postProduct);
 
 module.exports = RouterProduct;

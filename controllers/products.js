@@ -12,7 +12,7 @@ const getProduct = async (req, res) => {
         .status(StatusCodes.OK)
         .json({ error: { mgs: `No product by id: ${req.params.id}` } });
     }
-    res.status(StatusCodes.OK).json({ product });
+    res.status(StatusCodes.OK).json(product);
   } catch (error) {
     throw new Error(error);
   }
@@ -112,7 +112,10 @@ const getAllProduct = async (req, res) => {
       if (skip >= productCount) throw new Error("This Page does not exists");
     }
     const product = await query;
-    res.status(StatusCodes.OK).json(product);
+    res.status(StatusCodes.OK).json({
+      pageItems: product || [],
+      pageInfo: {},
+    });
   } catch (error) {
     throw new Error(error);
   }

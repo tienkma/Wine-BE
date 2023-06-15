@@ -39,7 +39,7 @@ app.use("/api/v1/user", RouteUser);
 app.use("/api/v1/cart", authMiddleware, RouteCart);
 app.use("/api/v1/upload", authMiddleware, RouterUploadIamge);
 app.use("/api/v1/order", authMiddleware, RouterOrder);
-app.use("/api/v1/resetPassword", authMiddleware, RouterResetPassword);
+// app.use("/api/v1/resetPassword", authMiddleware, RouterResetPassword);
 
 app.use(errorHandlerMiddleware);
 app.use(notFoundMiddleware);
