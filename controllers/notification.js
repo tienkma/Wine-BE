@@ -19,6 +19,6 @@ const getAllNotidication = async (req, res) => {
 };
 
 module.exports = {
-  createMess,
-  getAllMessage,
+  createNotidication,
+  getAllNotidication,
 };

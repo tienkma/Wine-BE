@@ -12,7 +12,6 @@ const orderQuery = async (req, res) => {
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     let query = Orders.find(JSON.parse(queryStr));
-    console.log("queryStr", queryStr);
 
     // Sorting
 

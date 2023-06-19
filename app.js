@@ -7,6 +7,7 @@ const RouteUser = require("./routes/User");
 const RouteCart = require("./routes/CartRoute");
 const RouterOrder = require("./routes/Order");
 const RouterUploadIamge = require("./routes/UploadImage");
+const RouterNotification = require("./routes/NotificationRoute");
 const RouterResetPassword = require("./routes/ResetPassword");
 const connectDB = require("./db/connectDB");
 const errorHandlerMiddleware = require("./middleware/error-handler");
@@ -39,6 +40,7 @@ app.use("/api/v1/user", RouteUser);
 app.use("/api/v1/cart", authMiddleware, RouteCart);
 app.use("/api/v1/upload", authMiddleware, RouterUploadIamge);
 app.use("/api/v1/order", authMiddleware, RouterOrder);
+app.use("/api/v1/notification", authMiddleware, RouterNotification);
 // app.use("/api/v1/resetPassword", authMiddleware, RouterResetPassword);
 
 app.use(errorHandlerMiddleware);
