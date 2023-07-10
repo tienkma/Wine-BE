@@ -24,7 +24,7 @@ const authSchemas = new mongoose.Schema({
     type: String,
     required: [true, "Please provide password"],
   },
-  roles: {
+  role: {
     type: String,
     enum: ["admin", "user", "employee"],
     default: "user",

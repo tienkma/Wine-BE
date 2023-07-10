@@ -43,9 +43,11 @@ const register = async (req, res) => {
       .json({ error: { msg: "Email already exist!" } });
   }
 
-  const user = await Users.create({ ...req.body });
+  const user = new Users({ ...req.body });
+  await user.save();
+  const { password, _id, ...rest } = user.toObject();
   const token = user.createJWT();
-  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
+  res.status(StatusCodes.CREATED).json({ user: { ...rest, id: _id }, token });
 };
 
 const changePassword = async (req, res) => {

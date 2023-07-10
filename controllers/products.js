@@ -73,11 +73,10 @@ const deleteProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
   // const ProductList = await Products.find({}).sort("createdAt");
   try {
-    const queryObj = { ...req.query };
-    const { filter } = req.body;
+    const  filter  = req.body;
     const excludeFields = ["page", "sort", "limit", "fields"];
-    excludeFields.forEach((el) => delete queryObj[el]);
-    let queryStr = JSON.stringify(queryObj);
+    excludeFields.forEach((el) => delete filter[el]);
+    let queryStr = JSON.stringify(filter);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     let query = Products.find(JSON.parse(queryStr));
@@ -106,14 +105,18 @@ const getAllProduct = async (req, res) => {
     const limit = req.query.limit;
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
+    let productCount = 1;
     if (req.query.page) {
-      const productCount = await Products.countDocuments();
-      if (skip >= productCount) throw new Error("This Page does not exists");
+      productCount = await Products.countDocuments(JSON.parse(queryStr));
+      if (skip > productCount) throw new Error("This Page does not exists");
     }
     const product = await query;
     res.status(StatusCodes.OK).json({
       pageItems: product || [],
-      pageInfo: {},
+      pageInfo: {
+        totalPage: Math.ceil(productCount / limit),
+        page: req.query.page
+      },
     });
   } catch (error) {
     throw new Error(error);

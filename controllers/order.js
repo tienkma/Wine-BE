@@ -4,11 +4,10 @@ const Users = require("../models/authModels");
 
 const orderQuery = async (req, res) => {
   try {
-    const queryObj = { ...req.query };
     const { filter } = req.body;
     const excludeFields = ["page", "sort", "limit", "fields"];
-    excludeFields.forEach((el) => delete queryObj[el]);
-    let queryStr = JSON.stringify(queryObj);
+    excludeFields.forEach((el) => delete filter[el]);
+    let queryStr = JSON.stringify(filter);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
     let query = Orders.find(JSON.parse(queryStr));
