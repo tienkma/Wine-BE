@@ -7,6 +7,11 @@ const CommentSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "Comments",
     },
+    productId: {
+      type: mongoose.Types.ObjectId,
+      ref: "Comments",
+      require: true,
+    },
     content: {
       type: String,
       require: true,

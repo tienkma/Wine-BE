@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema(
       type: String,
     },
     price: {
-      type: String,
+      type: Number,
     },
     description: {
       type: String,
@@ -44,6 +44,9 @@ const productSchema = new mongoose.Schema(
       ref: "User",
       required: [false, "Please provide user"],
       // default: "62f3ad071918307b2bbec306",
+    },
+    quantity: {
+      type: Number,
     },
   },
   { timestamps: true }

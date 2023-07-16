@@ -71,10 +71,9 @@ const deleteProduct = async (req, res) => {
 };
 
 const getAllProduct = async (req, res) => {
-  // const ProductList = await Products.find({}).sort("createdAt");
   try {
-    const  filter  = req.body;
-    const excludeFields = ["page", "sort", "limit", "fields"];
+    const filter = { ...req.body };
+    const excludeFields = ["page", "sort", "limit", "sortBy", "sortDirection"];
     excludeFields.forEach((el) => delete filter[el]);
     let queryStr = JSON.stringify(filter);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
@@ -82,21 +81,18 @@ const getAllProduct = async (req, res) => {
     let query = Products.find(JSON.parse(queryStr));
 
     // Sorting
+    const sortDirection =
+      req.body.sortDirection === "asc"
+        ? 1
+        : req.body.sortDirection === "des"
+        ? -1
+        : "";
 
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
+    if (sortDirection) {
+      const sortBy = { createAt: -1, [req.body.sortBy]: sortDirection };
       query = query.sort(sortBy);
     } else {
-      query = query.sort("-createdAt");
-    }
-
-    // limiting the fields
-
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
+      query = query.sort({ createAt: -1 });
     }
 
     // pagination
@@ -115,7 +111,7 @@ const getAllProduct = async (req, res) => {
       pageItems: product || [],
       pageInfo: {
         totalPage: Math.ceil(productCount / limit),
-        page: req.query.page
+        page: req.query.page,
       },
     });
   } catch (error) {

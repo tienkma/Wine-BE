@@ -4,9 +4,10 @@ const Users = require("../models/authModels");
 
 const orderQuery = async (req, res) => {
   try {
-    const { filter } = req.body;
+    const filter = { ...(req.body || {}), createdBy: req.user.userId };
     const excludeFields = ["page", "sort", "limit", "fields"];
     excludeFields.forEach((el) => delete filter[el]);
+    console.log("filter", filter);
     let queryStr = JSON.stringify(filter);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
@@ -14,11 +15,18 @@ const orderQuery = async (req, res) => {
 
     // Sorting
 
+    const sortDirection =
+      req.body.sortDirection === "asc"
+        ? 1
+        : req.body.sortDirection === "des"
+        ? -1
+        : "";
+
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
+      const sortBy = { createAt: -1, [req.body.sortBy]: sortDirection };
       query = query.sort(sortBy);
     } else {
-      query = query.sort("-createdAt");
+      query = query.sort({ createAt: -1 });
     }
 
     // limiting the fields
@@ -36,25 +44,40 @@ const orderQuery = async (req, res) => {
     const limit = req.query.limit;
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
+    let orderCount = 1;
+
     if (req.query.page) {
-      const orderCount = await Orders.countDocuments();
-      if (skip >= orderCount) throw new Error("This Page does not exists");
+      orderCount = await Orders.countDocuments(JSON.parse(queryStr));
+      if (skip > orderCount) throw new Error("This Page does not exists");
     }
+
     const order = await query;
-    res.status(StatusCodes.OK).json(order);
+
+    res.status(StatusCodes.OK).json({
+      pageItems: order || [],
+      pageInfo: {
+        totalPage: Math.ceil(orderCount / limit),
+        page: req.query.page,
+      },
+    });
   } catch (error) {
     throw new Error(error);
   }
 };
 
 const createOrder = async (req, res) => {
-  const order = await Orders.create(req.body);
-  res.status(StatusCodes.CREATED).json({ order });
+  const order = await Orders.create({
+    ...req.body,
+    email: "tien@gmail.com",
+    createdBy: req.user.userId,
+  });
+  res.status(StatusCodes.CREATED).json(order);
 };
 
 const deleteOrder = async (req, res) => {
   try {
     const order = await Orders.findByIdAndRemove({
+      createdBy: req.params.id,
       _id: req.params.id,
     });
     if (!order) {
@@ -71,6 +94,7 @@ const deleteOrder = async (req, res) => {
 const getOrder = async (req, res) => {
   try {
     const order = await Orders.findById({
+      createdBy: req.params.id,
       _id: req.params.id,
     });
     if (!order) {

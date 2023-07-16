@@ -19,54 +19,28 @@ const createComment = async (req, res) => {
   }
 };
 
-const deleteComment = async (req, res) => {
+const queryComments = async (req, res) => {
   try {
-    const comment = await Comments.findByIdAndRemove({
-      // createdBy: req.user.userId,
-      _id: req.params.id,
-    });
-    if (!comment) {
-      res
-        .status(StatusCodes.OK)
-        .json({ error: { mgs: `No comment by id: ${req.params.id}` } });
-    }
-    res.status(StatusCodes.OK).json({ comment });
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-const getAllComment = async (req, res) => {
-  // const commentList = await Comments.find({}).sort("createdAt");
-  try {
-    const queryObj = { ...req.query };
-    const { filter } = req.body;
+    const filter = req.body;
     const excludeFields = ["page", "sort", "limit", "fields"];
-    excludeFields.forEach((el) => delete queryObj[el]);
-    let queryStr = JSON.stringify(queryObj);
+    excludeFields.forEach((el) => delete filter[el]);
+    let queryStr = JSON.stringify(filter);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    let query = Comments.find({
-      productId: req.params.id,
-      currentId: { $exists: true, $ne: null },
-    });
+    let query = Comments.find(JSON.parse(queryStr));
 
     // Sorting
-
+    const sortDirection =
+      req.body.sortDirection === "asc"
+        ? 1
+        : req.body.sortDirection === "des"
+        ? -1
+        : "";
     if (req.query.sort) {
-      const sortBy = req.query.sort.split(",").join(" ");
+      const sortBy = { createAt: -1, [req.body.sortBy]: sortDirection };
       query = query.sort(sortBy);
     } else {
-      query = query.sort("-createdAt");
-    }
-
-    // limiting the fields
-
-    if (req.query.fields) {
-      const fields = req.query.fields.split(",").join(" ");
-      query = query.select(fields);
-    } else {
-      query = query.select("-__v");
+      query = query.sort({ createAt: -1 });
     }
 
     // pagination
@@ -74,22 +48,28 @@ const getAllComment = async (req, res) => {
     const page = req.query.page;
     const limit = req.query.limit;
     const skip = (page - 1) * limit;
-    query = query.skip(skip).limit(limit);
+    // query = query.skip(skip).limit(limit);
+    let commentCount = 1;
     if (req.query.page) {
-      const commentCount = await Comments.countDocuments({
+      commentCount = await Comments.countDocuments({
         productId: req.params.id,
         currentId: { $exists: true, $ne: null },
       });
-      if (skip >= commentCount) throw new Error("This Page does not exists");
+      // if (skip > commentCount) throw new Error("This Page does not exists");
     }
     const comment = await query;
-    res.status(StatusCodes.OK).json(comment);
+    res.status(StatusCodes.OK).json({
+      pageItems: comment || [],
+      pageInfo: {
+        totalPage: Math.ceil(commentCount / limit),
+        page: req.query.page,
+      },
+    });
   } catch (error) {
     throw new Error(error);
   }
 };
 module.exports = {
   createComment,
-  deleteComment,
-  getAllComment,
+  queryComments,
 };

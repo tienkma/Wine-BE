@@ -1,19 +1,48 @@
 const mongoose = require("mongoose");
+const Products = require("./productModels");
 
 const orderSchema = new mongoose.Schema({
   total: {
     type: Number,
     required: true,
   },
-  status: {
-    type: String,
-    default: "Processing",
-  },
-  email: {
+
+  firstName: {
     type: String,
     required: true,
-  }, 
-  cart: {
+  },
+  products: {
+    type: [Products.schema],
+    required: true,
+  },
+
+  lastName: {
+    type: String,
+    required: true,
+  },
+  address: {
+    type: String,
+    required: true,
+  },
+
+  city: {
+    type: String,
+    required: true,
+  },
+
+  postCode: {
+    type: String,
+    // required: true,
+  },
+
+  status: {
+    type: String,
+    default: "processing",
+  },
+  notes: {
+    type: String,
+  },
+  email: {
     type: String,
     required: true,
   },
@@ -24,7 +53,7 @@ const orderSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Types.ObjectId,
     ref: "User",
-    required: [false, "Please provide user"],
+    required: [true, "Please provide user"],
   },
 });
 

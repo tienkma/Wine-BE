@@ -8,7 +8,8 @@ const {
   deleteOrder,
 } = require("../controllers/order");
 
-RouterOrder.route("/").get(orderQuery).post(createOrder);
+RouterOrder.route("/").post(createOrder);
+RouterOrder.route("/query").post(orderQuery);
 
 RouterOrder.route("/:id").get(getOrder).delete(deleteOrder);
 
