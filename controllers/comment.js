@@ -6,6 +6,7 @@ const createComment = async (req, res) => {
   try {
     const comment = await Comments.create({
       ...req.body,
+      user: req.user,
     });
     if (!comment) {
       return res.status(StatusCodes.OK).json({
