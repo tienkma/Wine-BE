@@ -14,7 +14,7 @@ const createComment = async (req, res) => {
         status: StatusCodes.BAD_REQUEST,
       });
     }
-    res.status(StatusCodes.OK).json({ comment });
+    res.status(StatusCodes.OK).json(comment);
   } catch (error) {
     throw new Error(error);
   }
