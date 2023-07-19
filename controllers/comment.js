@@ -6,6 +6,7 @@ const createComment = async (req, res) => {
   try {
     const comment = await Comments.create({
       ...req.body,
+      user: req.user,
     });
     if (!comment) {
       return res.status(StatusCodes.OK).json({
@@ -13,7 +14,7 @@ const createComment = async (req, res) => {
         status: StatusCodes.BAD_REQUEST,
       });
     }
-    res.status(StatusCodes.OK).json({ comment });
+    res.status(StatusCodes.OK).json(comment);
   } catch (error) {
     throw new Error(error);
   }
