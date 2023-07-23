@@ -23,10 +23,10 @@ const orderQuery = async (req, res) => {
         : "";
 
     if (req.query.sort) {
-      const sortBy = { createAt: -1, [req.body.sortBy]: sortDirection };
+      const sortBy = { createdAt: -1, [req.body.sortBy]: sortDirection };
       query = query.sort(sortBy);
     } else {
-      query = query.sort({ createAt: -1 });
+      query = query.sort({ createdAt: -1 });
     }
 
     // limiting the fields
